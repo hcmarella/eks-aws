@@ -4,7 +4,7 @@
 
 1. Develop in a branch. `make test` (replay runner, no model, no AWS).
 2. Open a PR. CI runs tests and YAML lint.
-3. Merge to `main`. CI builds `conductor:<git-sha>` and pushes to ECR (OIDC role; tags are immutable).
+3. Merge to `main`. CI builds `fraudagent:<git-sha>` and pushes to ECR (OIDC role; tags are immutable).
 4. Run the **promote** workflow with env=`dev` and the SHA. It opens a PR that only changes `image.tag` in `values-dev.yaml`. Merge → Argo CD auto-syncs dev.
 5. Dev gate: eval harness and failure drills pass. Run **promote** for `qa`. Merge needs a reviewer; sync in Argo CD is manual.
 6. QA gate: shadow-mode comparison against BAU outputs. Run **promote** for `prod`. Merge needs approvers plus a change ticket; sync is manual.

@@ -1,13 +1,13 @@
 env: local
 image:
-  repository: conductor
+  repository: fraudagent
   tag: local            # CI sets this to the git SHA via values-<env>.yaml
   pullPolicy: IfNotPresent
 modelRunner: replay      # replay | bedrock
 bedrockModelId: ""
 awsRegion: us-east-1
 database:
-  existingSecret: conductor-db   # key: url  (created outside git; never commit)
+  existingSecret: fraudagent-db   # key: url  (created outside git; never commit)
 serviceAccounts:
   agentRoleArn: ""        # only used with IRSA; Pod Identity needs no annotation
   dispatcherRoleArn: ""

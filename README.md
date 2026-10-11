@@ -1,4 +1,4 @@
-# eks-aws — Conductor agent platform (master reference repo)
+# eks-aws — FraudAgent platform (master reference repo)
 
 Standard template for taking a LangGraph agent from **local → dev → qa → prod** on **ECR + EKS** with **Helm, Terraform, Argo CD** and GitHub Actions. Use this repo as the starting point for each new agent.
 
@@ -23,21 +23,22 @@ Constraints: Bedrock only in production; synthetic data only outside the approve
 ## Environment ladder
 ![promotion](docs/images/d9_promotion.png)
 
-Same image (tag = git SHA, immutable) and same Helm chart everywhere; only `helm/conductor/values-<env>.yaml` and `terraform/envs/<env>` differ. Details: [docs/promotion-flow.md](docs/promotion-flow.md). CI/CD picture: [d5](docs/images/d5_cicd.png).
+Same image (tag = git SHA, immutable) and same Helm chart everywhere; only `helm/fraudagent/values-<env>.yaml` and `terraform/envs/<env>` differ. Details: [docs/promotion-flow.md](docs/promotion-flow.md). CI/CD picture: [d5](docs/images/d5_cicd.png).
 
 ## Repo layout
 ```
 app/                 graph.py + cli.py (starter), pipeline/ (BAU stage skeletons), config/pipeline.yaml, personas/, prompts/,
                      dispatcher.py, poller.py (stub), portal.py (stub), schema.sql, tests
 Dockerfile, docker-compose.yml, Makefile
-helm/conductor/      chart + values-{local,dev,qa,prod}.yaml
+helm/fraudagent/      chart + values-{local,dev,qa,prod}.yaml
 k8s/local/           throwaway Postgres for minikube
 argocd/              AppProject + Applications (dev auto-sync, qa/prod manual)
 terraform/modules/   ecr rds s3 eks iam_policies iam_pod_identity iam_irsa
 terraform/envs/      dev qa prod (ECR is created in dev only and shared)
 .github/workflows/   ci (test+build+push), promote (tag-bump PR), terraform (validate+plan)
 scripts/             local-up.sh, promote.sh, create-db-secret.sh, init-db.sh
-docs/                runbook.md, new-agent-template.md, master-reference.md, Word runbook, access-requests, promotion-flow, images
+docs/                execution-order.md, aws-setup.md, environment-testing-and-migration.md, prod-readiness-checklist.md,
+                     promotion-flow.md, access-requests.md, runbook.md, new-agent-template.md, master-reference.md, Word runbook, access-requests, promotion-flow, images
 ```
 
 ## Quick start (local, no AWS, no model)
@@ -54,7 +55,7 @@ Local with a real model (synthetic data only, needs approval): `MODEL_RUNNER=ant
 2. Create the Terraform state bucket + lock table; edit `backend` blocks and `*.tfvars`.
 3. `terraform -chdir=terraform/envs/dev init && plan -var-file=dev.tfvars`, review, apply.
 4. Install Argo CD on the cluster; `kubectl apply -f argocd/`.
-5. Create the DB secret `conductor-db` (key `url`) from the RDS secret; never commit it.
+5. Create the DB secret `fraudagent-db` (key `url`) from the RDS secret; never commit it.
 6. Merge to main → image in ECR → run **promote** for dev. Repeat qa, prod with gates.
 
 ## Docs
@@ -63,7 +64,7 @@ Local with a real model (synthetic data only, needs approval): `MODEL_RUNNER=ant
 - [docs/environment-testing-and-migration.md](docs/environment-testing-and-migration.md): how to test and migrate at each stage
 - [docs/prod-readiness-checklist.md](docs/prod-readiness-checklist.md): what prod-grade needs, by gate
 - [docs/master-reference.md](docs/master-reference.md): runbook for all targets (EKS, AgentCore), limits, costs, open items
-- [docs/Conductor_Infrastructure_Setup_Runbook.docx](docs/Conductor_Infrastructure_Setup_Runbook.docx): infra setup, requests, diagrams
+- [docs/FraudAgent_Infrastructure_Setup_Runbook.docx](docs/FraudAgent_Infrastructure_Setup_Runbook.docx): infra setup, requests, diagrams
 
 ## Safety rules
 Check `kubectl config current-context` before any apply/delete. No real case data outside the approved environment. Shadow mode before limited live use. Preserve the stalled BAU run's evidence.

@@ -10,7 +10,7 @@ spec:
     spec:
       containers:
         - name: portal
-          image: {{ include "conductor.image" . }}
+          image: {{ include "fraudagent.image" . }}
           command: ["python", "portal.py"]   # placeholder, not written yet
           ports: [{containerPort: {{ .Values.portal.port }}}]
 ---

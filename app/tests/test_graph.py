@@ -14,7 +14,7 @@ def test_graph_other():
 
 
 def test_job_spec_limits():
-    j = job_spec("C_1", 3, "img:abc", "conductor-dev")
+    j = job_spec("C_1", 3, "img:abc", "fraudagent-dev")
     assert j["metadata"]["name"] == "agent-c-1-v3"
     assert j["spec"]["backoffLimit"] == 1 and j["spec"]["activeDeadlineSeconds"] > 0
     assert j["spec"]["template"]["spec"]["containers"][0]["securityContext"]["readOnlyRootFilesystem"]

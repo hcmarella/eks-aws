@@ -12,14 +12,14 @@ Before any kubectl/helm command: `kubectl config current-context` and confirm it
 |---|---|---|
 | Unit + graph | `make test` | all green, no network |
 | Run graph on replay | `make run` | JSON output, no model call |
-| Container | `docker build -t conductor:local .` then `docker run --rm -e MODEL_RUNNER=replay conductor:local` | exits 0 |
+| Container | `docker build -t fraudagent:local .` then `docker run --rm -e MODEL_RUNNER=replay fraudagent:local` | exits 0 |
 | DB + schema | `docker compose up --build` | tables from `app/schema.sql` exist; rerun a case twice and see no duplicate ledger rows |
-| Chart on minikube | `./scripts/local-up.sh` | pods Running; `helm lint helm/conductor -f helm/conductor/values-local.yaml` clean |
+| Chart on minikube | `./scripts/local-up.sh` | pods Running; `helm lint helm/fraudagent -f helm/fraudagent/values-local.yaml` clean |
 | Crash/resume | kill the agent mid-case, rerun | resumes from last ledger step |
 | Loop caps | feed a case that always yields bugs | stops at `replan_max`, outcome HOLD |
 | Real model (optional) | `MODEL_RUNNER=anthropic` with synthetic data only, approval needed | outputs pass schema validation |
 
-**Exit to dev:** tests green, PR approved, merged to `main`, CI pushed `conductor:<sha>` to ECR.
+**Exit to dev:** tests green, PR approved, merged to `main`, CI pushed `fraudagent:<sha>` to ECR.
 
 ## Stage 2: DEV (EKS, synthetic data, Bedrock, limited quota)
 **Goal:** it works on AWS plumbing: IAM, network, RDS, Bedrock, Jobs.
@@ -28,8 +28,8 @@ Before any kubectl/helm command: `kubectl config current-context` and confirm it
 - `terraform/envs/dev/dev.tfvars`: `vpc_id`, `private_subnet_ids`
 - `terraform/envs/dev/main.tf`: `backend` bucket and lock table, S3 artifact bucket name
 - GitHub repo variables: `AWS_ECR_PUSH_ROLE_ARN`, `AWS_TF_PLAN_ROLE_ARN`
-- `helm/conductor/values-dev.yaml`: `ACCOUNT_ID` in image repository, `bedrockModelId`
-- Create secret `conductor-db` (key `url`) in the namespace from the RDS-managed secret; never commit it
+- `helm/fraudagent/values-dev.yaml`: `ACCOUNT_ID` in image repository, `bedrockModelId`
+- Create secret `fraudagent-db` (key `url`) in the namespace from the RDS-managed secret; never commit it
 - Run `app/schema.sql` against RDS (or add a migration job)
 - `kubectl apply -f argocd/` (project + `app-dev.yaml`)
 
@@ -38,7 +38,7 @@ Before any kubectl/helm command: `kubectl config current-context` and confirm it
 | Test | How | Pass when |
 |---|---|---|
 | Terraform | `terraform -chdir=terraform/envs/dev plan -var-file=dev.tfvars` | clean plan, reviewed |
-| Rollout | `kubectl -n conductor-dev get pods`; Argo app Healthy | dispatcher Running |
+| Rollout | `kubectl -n fraudagent-dev get pods`; Argo app Healthy | dispatcher Running |
 | Identity | agent pod calls Bedrock | no AccessDenied; role is least privilege |
 | Network | pod reaches RDS and Bedrock endpoint only | other egress blocked |
 | End-to-end | insert a synthetic row into `case_outbox` | Job created, ledger filled, outcome + seal written |
@@ -96,7 +96,7 @@ Before any kubectl/helm command: `kubectl config current-context` and confirm it
 ## What migrates, in one table
 | Item | local | dev | qa | prod |
 |---|---|---|---|---|
-| Image | `conductor:local` | `…/conductor:<sha>` | same sha | same sha |
+| Image | `fraudagent:local` | `…/fraudagent:<sha>` | same sha | same sha |
 | Values file | values-local | values-dev | values-qa | values-prod |
 | Terraform env | none | envs/dev | envs/qa | envs/prod |
 | DB | pod | RDS small | RDS Multi-AZ | RDS Multi-AZ, protected |

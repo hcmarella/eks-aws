@@ -26,6 +26,6 @@ jobs:
       - id: ecr
         uses: aws-actions/amazon-ecr-login@v2
       - run: |
-          IMG=${{ steps.ecr.outputs.registry }}/conductor:${{ github.sha }}
+          IMG=${{ steps.ecr.outputs.registry }}/fraudagent:${{ github.sha }}
           docker build -t "$IMG" .
           docker push "$IMG"

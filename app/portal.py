@@ -4,7 +4,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 
 class H(BaseHTTPRequestHandler):
     def do_GET(self):
-        self.send_response(200); self.end_headers(); self.wfile.write(b"conductor portal stub")
+        self.send_response(200); self.end_headers(); self.wfile.write(b"fraudagent portal stub")
 
 
 if __name__ == "__main__":

@@ -1,5 +1,5 @@
 # Access and approvals to request (start day 1; these set the schedule)
-See the Word runbook (`Conductor_Infrastructure_Setup_Runbook.docx`) for fill-in sheets and request wording. Summary:
+See the Word runbook (`FraudAgent_Infrastructure_Setup_Runbook.docx`) for fill-in sheets and request wording. Summary:
 - AWS account(s) per env, region, VPC and private subnets (IDs go in `terraform/envs/*/*.tfvars`)
 - Bedrock model access (which Claude models, quotas) in the region
 - ECR push role and Terraform plan role trusted for GitHub OIDC (set repo variables `AWS_ECR_PUSH_ROLE_ARN`, `AWS_TF_PLAN_ROLE_ARN`)

@@ -11,10 +11,10 @@ spec:
       securityContext: {runAsNonRoot: true, runAsUser: 10001}
       containers:
         - name: dispatcher
-          image: {{ include "conductor.image" . }}
+          image: {{ include "fraudagent.image" . }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["python", "dispatcher.py"]
           env:
-{{ include "conductor.env" . | indent 12 }}
+{{ include "fraudagent.env" . | indent 12 }}
           securityContext: {readOnlyRootFilesystem: true, allowPrivilegeEscalation: false}
           resources: {requests: {cpu: 100m, memory: 256Mi}, limits: {cpu: 500m, memory: 512Mi}}

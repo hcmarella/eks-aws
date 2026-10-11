@@ -1,8 +1,8 @@
 # LOCAL ONLY. Throwaway Postgres with a dummy password. Never used in dev/qa/prod (they use RDS).
 apiVersion: v1
 kind: Secret
-metadata: {name: conductor-db}
-stringData: {url: "postgresql://postgres:local-only@postgres:5432/conductor"}
+metadata: {name: fraudagent-db}
+stringData: {url: "postgresql://postgres:local-only@postgres:5432/fraudagent"}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -16,7 +16,7 @@ spec:
       containers:
         - name: postgres
           image: postgres:16
-          env: [{name: POSTGRES_PASSWORD, value: local-only}, {name: POSTGRES_DB, value: conductor}]
+          env: [{name: POSTGRES_PASSWORD, value: local-only}, {name: POSTGRES_DB, value: fraudagent}]
           ports: [{containerPort: 5432}]
 ---
 apiVersion: v1

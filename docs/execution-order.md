@@ -24,7 +24,7 @@ One ordered list. Each step names the doc with the detail. ☐ = tick as done. C
 
 ## Phase 3 — Week 2: dev environment
 - ☐ 3.1 `terraform validate` / `plan` / `apply` envs/dev → EKS, ECR, RDS, S3, IAM roles + Pod Identity
-- ☐ 3.2 CI builds image `conductor:<sha>` → ECR
+- ☐ 3.2 CI builds image `fraudagent:<sha>` → ECR
 - ☐ 3.3 Install Argo CD; `kubectl apply -f argocd/project.yaml argocd/app-dev.yaml` (check kubectl context first)
 - ☐ 3.4 `scripts/create-db-secret.sh dev …`, `scripts/init-db.sh dev` → aws-setup.md §3
 - ☐ 3.5 Promote workflow env=dev → merge PR → Argo syncs
@@ -65,4 +65,4 @@ Check `kubectl config current-context` before any apply/delete. No secrets in gi
 | [promotion-flow.md](promotion-flow.md) | release mechanics |
 | [runbook.md](runbook.md) | operations |
 | [master-reference.md](master-reference.md) | targets, limits, costs |
-| Conductor_Infrastructure_Setup_Runbook.docx | Word version with request texts and diagrams |
+| FraudAgent_Infrastructure_Setup_Runbook.docx | Word version with request texts and diagrams |

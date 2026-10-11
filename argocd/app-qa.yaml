@@ -1,12 +1,12 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
-metadata: {name: conductor-qa, namespace: argocd}
+metadata: {name: fraudagent-qa, namespace: argocd}
 spec:
-  project: conductor
+  project: fraudagent
   source:
     repoURL: https://github.com/hcmarella/eks-aws.git
     targetRevision: main
-    path: helm/conductor
+    path: helm/fraudagent
     helm: {valueFiles: [values.yaml, values-qa.yaml]}
-  destination: {server: https://kubernetes.default.svc, namespace: conductor-qa}
+  destination: {server: https://kubernetes.default.svc, namespace: fraudagent-qa}
   syncPolicy: {syncOptions: [CreateNamespace=true]}   # manual sync = approval gate

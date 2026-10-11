@@ -25,7 +25,7 @@ resource "aws_db_instance" "this" {
   multi_az                    = var.multi_az
   db_subnet_group_name        = aws_db_subnet_group.this.name
   vpc_security_group_ids      = [aws_security_group.db.id]
-  username                    = "conductor"
+  username                    = "fraudagent"
   manage_master_user_password = true # password lives in Secrets Manager, not in state files or git
   backup_retention_period     = 7
   deletion_protection         = var.multi_az

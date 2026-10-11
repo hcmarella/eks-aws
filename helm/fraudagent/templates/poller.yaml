@@ -16,7 +16,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: poller
-              image: {{ include "conductor.image" . }}
+              image: {{ include "fraudagent.image" . }}
               command: ["python", "poller.py"]
               env:
-{{ include "conductor.env" . | indent 16 }}
+{{ include "fraudagent.env" . | indent 16 }}

@@ -3,7 +3,7 @@ terraform {
   required_providers { aws = { source = "hashicorp/aws", version = "~> 5.0" } }
   backend "s3" {
     bucket         = "REPLACE-tfstate-bucket"   # created once by hand
-    key            = "conductor/dev/terraform.tfstate"
+    key            = "fraudagent/dev/terraform.tfstate"
     region         = "us-east-1"
     dynamodb_table = "REPLACE-tf-lock"
     encrypt        = true
@@ -14,11 +14,11 @@ variable "region" { default = "us-east-1" }
 variable "vpc_id" { type = string }
 variable "private_subnet_ids" { type = list(string) }
 
-locals { name = "conductor-dev" }
+locals { name = "fraudagent-dev" }
 
 module "ecr" {
   source = "../../modules/ecr"
-  name   = "conductor" # one repo shared by all envs; promote by tag, never rebuild
+  name   = "fraudagent" # one repo shared by all envs; promote by tag, never rebuild
 }
 module "eks" {
   source              = "../../modules/eks"
@@ -40,7 +40,7 @@ module "rds" {
 }
 module "artifacts" {
   source = "../../modules/s3"
-  bucket = "REPLACE-conductor-dev-artifacts"
+  bucket = "REPLACE-fraudagent-dev-artifacts"
 }
 
 variable "bedrock_model_ids" {
@@ -51,7 +51,7 @@ variable "bedrock_inference_profile_arns" {
   type    = list(string)
   default = []
 }
-variable "namespace" { default = "conductor-dev" }
+variable "namespace" { default = "fraudagent-dev" }
 
 module "iam_policies" {
   source                         = "../../modules/iam_policies"

@@ -31,7 +31,7 @@ AgentCore Runtime and EKS are alternative hosts. AgentCore Memory is a separate 
 
 ```
 repo/
-  conductor/            # the LangGraph: nodes, ledger, contracts, registry
+  fraudagent/            # the LangGraph: nodes, ledger, contracts, registry
   entrypoints/
     cli.py              # python -m entrypoints.cli --case <id>      (K8s Job / local)
     worker.py           # queue worker loop                          (EKS worker pool)
@@ -97,10 +97,10 @@ Only if bank policy allows. Synthetic data only. Set an AWS Budgets alert at $20
 
 ### 4.1 Cluster
 ```
-minikube start --driver=docker --cpus=4 --memory=8192 --profile conductor
-minikube addons enable metrics-server -p conductor
-kubectl config use-context conductor
-kubectl create namespace conductor
+minikube start --driver=docker --cpus=4 --memory=8192 --profile fraudagent
+minikube addons enable metrics-server -p fraudagent
+kubectl config use-context fraudagent
+kubectl create namespace fraudagent
 ```
 Pass: `kubectl get nodes` shows Ready; `kubectl top nodes` works after ~1 minute.
 
@@ -109,11 +109,11 @@ Note on Docker Desktop Kubernetes: `kubectl scale` works if Kubernetes is enable
 ### 4.2 Postgres and Langfuse
 ```
 helm repo add bitnami https://charts.bitnami.com/bitnami
-helm install pg bitnami/postgresql -n conductor \
-  --set auth.database=conductor --set auth.username=app --set auth.password=<local-only>
+helm install pg bitnami/postgresql -n fraudagent \
+  --set auth.database=fraudagent --set auth.username=app --set auth.password=<local-only>
 ```
 Langfuse: install per the current Langfuse self-host docs (Helm or compose). [U: chart values change; follow their docs.]
-Pass: `kubectl exec -n conductor pg-postgresql-0 -- psql -U app -d conductor -c 'select 1'`.
+Pass: `kubectl exec -n fraudagent pg-postgresql-0 -- psql -U app -d fraudagent -c 'select 1'`.
 
 ### 4.3 Schema (ledger, events, source, outbox)
 ```sql
@@ -140,19 +140,19 @@ Pass: update a row in `source_cases` and see one new `case_outbox` row; a second
 
 ### 4.4 Image
 ```
-eval $(minikube -p conductor docker-env)
-docker build -t conductor:dev .
+eval $(minikube -p fraudagent docker-env)
+docker build -t fraudagent:dev .
 ```
 Dockerfile essentials: python:3.12-slim, non-root user, `pip install -r requirements.txt`, `CMD ["python","-m","entrypoints.cli"]`. For AgentCore, a second target runs `entrypoints.agentcore_app` on port 8080 (arm64).
 
 ### 4.5 Dispatcher and Job-per-case
-Dispatcher (a small deployment): loops on `SELECT ... FROM case_outbox WHERE status='new' FOR UPDATE SKIP LOCKED`, creates a Kubernetes Job `case-<id>-v<version>`, sets status `running`, later `done|failed`. Needs a ServiceAccount with Role to create/get/list Jobs in `conductor`.
+Dispatcher (a small deployment): loops on `SELECT ... FROM case_outbox WHERE status='new' FOR UPDATE SKIP LOCKED`, creates a Kubernetes Job `case-<id>-v<version>`, sets status `running`, later `done|failed`. Needs a ServiceAccount with Role to create/get/list Jobs in `fraudagent`.
 
 Job spec essentials:
 ```yaml
 apiVersion: batch/v1
 kind: Job
-metadata: {name: case-<id>-v<ver>, namespace: conductor}
+metadata: {name: case-<id>-v<ver>, namespace: fraudagent}
 spec:
   backoffLimit: 1
   activeDeadlineSeconds: 86400
@@ -162,13 +162,13 @@ spec:
       restartPolicy: Never
       containers:
       - name: graph
-        image: conductor:dev
+        image: fraudagent:dev
         imagePullPolicy: Never          # local image; use ECR URL later
         args: ["--case","<id>"]
-        envFrom: [{secretRef: {name: conductor-env}}]
+        envFrom: [{secretRef: {name: fraudagent-env}}]
         resources: {requests: {cpu: 250m, memory: 512Mi}, limits: {memory: 1Gi}}
 ```
-Pass: insert a case -> a pod appears (`kubectl get pods -n conductor -w`) -> Job completes -> outbox row `done` -> report file written.
+Pass: insert a case -> a pod appears (`kubectl get pods -n fraudagent -w`) -> Job completes -> outbox row `done` -> report file written.
 
 ### 4.6 Model runner for local
 `MODEL_RUNNER=replay`: returns recorded BAU outputs and sleeps for scaled recorded durations. Label results "projected from recorded BAU timings". Switch to `bedrock` only where credentials and approvals exist.
@@ -246,7 +246,7 @@ Match `--platform` to node CPU (arm64 Graviton or amd64). If unsure: `linux/amd6
 ### 6.2 EKS
 Use the bank's provisioned cluster/namespace if one exists. Otherwise for a rehearsal:
 ```
-eksctl create cluster --name conductor-dev --region <region> --nodes 2 --node-type t4g.large
+eksctl create cluster --name fraudagent-dev --region <region> --nodes 2 --node-type t4g.large
 ```
 (creates a control plane that bills ~$0.10/hour; delete when done) [U].
 Then: namespace, ServiceAccount with IRSA or Pod Identity granting `bedrock:InvokeModel` (+ AgentCore Memory if used), metrics-server, and optional KEDA.
@@ -290,7 +290,7 @@ BAU-vs-new report: per case wall-clock, calls, tokens, retries, loop-backs, esca
 
 ## 8. Requests to send the platform / security team (copy-paste)
 
-1. Dev AWS account and region for the Conductor agent platform.
+1. Dev AWS account and region for the FraudAgent agent platform.
 2. Bedrock model access: <model list>; current quotas; increase request for requests/min and tokens/min.
 3. ECR repo `<agent>`; push policy (CI-only?); scan requirements.
 4. EKS namespace (or cluster) with IRSA/Pod Identity; node architecture; ability to run Jobs.
@@ -321,7 +321,7 @@ BAU-vs-new report: per case wall-clock, calls, tokens, retries, loop-backs, esca
 | Symptom | Likely cause | Fix |
 |---|---|---|
 | `exec format error` in pod | arm64 image on x86 node (or reverse) | Rebuild with the right `--platform` |
-| `ErrImagePull` locally | Not using minikube's Docker daemon | `eval $(minikube -p conductor docker-env)`; `imagePullPolicy: Never` |
+| `ErrImagePull` locally | Not using minikube's Docker daemon | `eval $(minikube -p fraudagent docker-env)`; `imagePullPolicy: Never` |
 | `ErrImagePull` on EKS | Node role lacks ECR read; wrong region/tag | Attach ECR read policy; check URL |
 | Pod OOMKilled | Memory limit too low | Raise limit; check evidence size in state |
 | Bedrock `ThrottlingException` | Quota / concurrency | Shared limiter + exponential backoff; request quota increase |
