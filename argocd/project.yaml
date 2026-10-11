@@ -1,0 +1,6 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata: {name: fraudagent, namespace: argocd}
+spec:
+  sourceRepos: ["https://github.com/hcmarella/eks-aws.git"]
+  destinations: [{namespace: "fraudagent-*", server: "*"}]

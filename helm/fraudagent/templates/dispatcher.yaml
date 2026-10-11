@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: dispatcher}
+spec:
+  replicas: {{ .Values.dispatcher.replicas }}
+  selector: {matchLabels: {app: dispatcher}}
+  template:
+    metadata: {labels: {app: dispatcher}}
+    spec:
+      serviceAccountName: dispatcher-sa
+      securityContext: {runAsNonRoot: true, runAsUser: 10001}
+      containers:
+        - name: dispatcher
+          image: {{ include "fraudagent.image" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["python", "dispatcher.py"]
+          env:
+{{ include "fraudagent.env" . | indent 12 }}
+          securityContext: {readOnlyRootFilesystem: true, allowPrivilegeEscalation: false}
+          resources: {requests: {cpu: 100m, memory: 256Mi}, limits: {cpu: 500m, memory: 512Mi}}

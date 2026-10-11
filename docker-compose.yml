@@ -1,0 +1,10 @@
+services:
+  db:
+    image: postgres:16
+    environment: {POSTGRES_PASSWORD: local-only, POSTGRES_DB: fraudagent}
+    volumes: ["./app/schema.sql:/docker-entrypoint-initdb.d/schema.sql"]
+    ports: ["5432:5432"]
+  agent:
+    build: .
+    environment: {MODEL_RUNNER: replay, DATABASE_URL: "postgresql://postgres:local-only@db:5432/fraudagent"}
+    depends_on: [db]

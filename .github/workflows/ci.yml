@@ -1,0 +1,31 @@
+name: ci
+on:
+  pull_request:
+  push: {branches: [main]}
+permissions: {id-token: write, contents: read}
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -r app/requirements.txt pyyaml
+      - run: make test
+      - run: make lint-yaml
+  build-push:
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ECR_PUSH_ROLE_ARN }}   # OIDC role, no stored keys
+          aws-region: us-east-1
+      - id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+      - run: |
+          IMG=${{ steps.ecr.outputs.registry }}/fraudagent:${{ github.sha }}
+          docker build -t "$IMG" .
+          docker push "$IMG"
