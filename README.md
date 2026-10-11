@@ -38,7 +38,7 @@ terraform/envs/      dev qa prod (ECR is created in dev only and shared)
 .github/workflows/   ci (test+build+push), promote (tag-bump PR), terraform (validate+plan)
 scripts/             local-up.sh, promote.sh, create-db-secret.sh, init-db.sh
 docs/                execution-order.md, aws-setup.md, environment-testing-and-migration.md, prod-readiness-checklist.md,
-                     promotion-flow.md, access-requests.md, runbook.md, new-agent-template.md, master-reference.md, Word runbook, access-requests, promotion-flow, images
+                     promotion-flow.md, access-requests.md, runbook.md, new-agent-template.md, master-reference.md, Word runbook, images/
 ```
 
 ## Quick start (local, no AWS, no model)
