@@ -2,7 +2,7 @@
 
 Standard template for taking a LangGraph agent from **local → dev → qa → prod** on **ECR + EKS** with **Helm, Terraform, Argo CD** and GitHub Actions. Use this repo as the starting point for each new agent.
 
-> **Status — read this first.** Verified here: the Python app and its 3 unit tests pass; YAML files parse. **Not yet validated** (tools not available when written): Helm templates (`helm lint`), Terraform (`terraform validate`/`plan`), the dispatcher against a real cluster, and the CI workflows. Placeholders to fill: `ACCOUNT_ID`, `REPLACE-*` bucket/table names, VPC and subnet IDs, Bedrock model IDs. `poller.py` and `portal.py` are referenced by the chart but not written yet.
+> **Status — read this first.** Verified here: the Python app and its 3 unit tests pass; YAML files parse. **Not yet validated** (tools not available when written): Helm templates (`helm lint`), Terraform (`terraform validate`/`plan`), the dispatcher against a real cluster, and the CI workflows. Placeholders to fill: `ACCOUNT_ID`, `REPLACE-*` bucket/table names, VPC and subnet IDs, Bedrock model IDs. `poller.py` is a stub (raises NotImplementedError), `portal.py` is a placeholder server, and the BAU stage bodies in `app/pipeline/stages.py` are skeletons.
 
 ## Context
 Business-as-usual fraud investigation runs in Claude Code on production data: 24–27+ hours per case, ~460 control defects. Goal: re-implement as a LangGraph pipeline with code-owned control flow, a durable Postgres ledger, bounded loops and timeouts.
@@ -27,7 +27,8 @@ Same image (tag = git SHA, immutable) and same Helm chart everywhere; only `helm
 
 ## Repo layout
 ```
-app/                 LangGraph graph, CLI, dispatcher, schema.sql, tests
+app/                 graph.py + cli.py (starter), pipeline/ (BAU stage skeletons), config/pipeline.yaml, personas/, prompts/,
+                     dispatcher.py, poller.py (stub), portal.py (stub), schema.sql, tests
 Dockerfile, docker-compose.yml, Makefile
 helm/conductor/      chart + values-{local,dev,qa,prod}.yaml
 k8s/local/           throwaway Postgres for minikube
@@ -36,12 +37,12 @@ terraform/modules/   ecr rds s3 iam_pod_identity eks
 terraform/envs/      dev qa prod (ECR is created in dev only and shared)
 .github/workflows/   ci (test+build+push), promote (tag-bump PR), terraform (validate+plan)
 scripts/             local-up.sh, promote.sh
-docs/                master-reference.md, Word runbook, access-requests, promotion-flow, images
+docs/                runbook.md, new-agent-template.md, master-reference.md, Word runbook, access-requests, promotion-flow, images
 ```
 
 ## Quick start (local, no AWS, no model)
 ```bash
-make test                       # 3 tests
+make test                       # 4 tests
 make run                        # runs the graph with MODEL_RUNNER=replay
 docker compose up --build       # app + Postgres
 ./scripts/local-up.sh           # minikube + helm with values-local.yaml (checks kubectl context first)
