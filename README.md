@@ -58,6 +58,7 @@ Local with a real model (synthetic data only, needs approval): `MODEL_RUNNER=ant
 6. Merge to main → image in ECR → run **promote** for dev. Repeat qa, prod with gates.
 
 ## Docs
+- **Start here: [docs/execution-order.md](docs/execution-order.md)** — everything below in order of execution
 - [docs/aws-setup.md](docs/aws-setup.md): IAM, Pod Identity/IRSA, RDS Postgres, Bedrock access
 - [docs/environment-testing-and-migration.md](docs/environment-testing-and-migration.md): how to test and migrate at each stage
 - [docs/prod-readiness-checklist.md](docs/prod-readiness-checklist.md): what prod-grade needs, by gate
