@@ -1,0 +1,22 @@
+# Polls Databricks Delta Change Data Feed using cdc_watermark. Polled, not instantaneous.
+# poller.py is a placeholder to be written in Phase 3 (see docs/master-reference.md).
+apiVersion: batch/v1
+kind: CronJob
+metadata: {name: cdc-poller}
+spec:
+  schedule: {{ .Values.poller.schedule | quote }}
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      activeDeadlineSeconds: 240
+      template:
+        spec:
+          serviceAccountName: dispatcher-sa
+          restartPolicy: Never
+          containers:
+            - name: poller
+              image: {{ include "conductor.image" . }}
+              command: ["python", "poller.py"]
+              env:
+{{ include "conductor.env" . | indent 16 }}

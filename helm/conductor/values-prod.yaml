@@ -1,0 +1,9 @@
+env: prod
+modelRunner: bedrock
+bedrockModelId: ""        # set after confirming enabled models in Bedrock
+image:
+  repository: ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/conductor
+  tag: "REPLACED_BY_PROMOTE_WORKFLOW"
+dispatcher: {replicas: 1}
+portal: {replicas: 2}
+quota: {cpu: "32", memory: 128Gi, pods: "60"}

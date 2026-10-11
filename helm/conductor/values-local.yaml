@@ -1,0 +1,5 @@
+env: local
+modelRunner: replay
+image: {repository: conductor, tag: local, pullPolicy: Never}
+portal: {enabled: false}
+quota: {cpu: "4", memory: 8Gi, pods: "15"}

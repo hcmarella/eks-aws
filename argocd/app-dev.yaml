@@ -1,0 +1,12 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata: {name: conductor-dev, namespace: argocd}
+spec:
+  project: conductor
+  source:
+    repoURL: https://github.com/hcmarella/eks-aws.git
+    targetRevision: main
+    path: helm/conductor
+    helm: {valueFiles: [values.yaml, values-dev.yaml]}
+  destination: {server: https://kubernetes.default.svc, namespace: conductor-dev}
+  syncPolicy: {automated: {prune: true, selfHeal: true}, syncOptions: [CreateNamespace=true]}

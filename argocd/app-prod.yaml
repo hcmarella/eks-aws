@@ -1,0 +1,12 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata: {name: conductor-prod, namespace: argocd}
+spec:
+  project: conductor
+  source:
+    repoURL: https://github.com/hcmarella/eks-aws.git
+    targetRevision: main
+    path: helm/conductor
+    helm: {valueFiles: [values.yaml, values-prod.yaml]}
+  destination: {server: https://kubernetes.default.svc, namespace: conductor-prod}
+  syncPolicy: {syncOptions: [CreateNamespace=true]}   # manual sync = approval gate

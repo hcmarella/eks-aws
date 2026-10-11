@@ -1,0 +1,17 @@
+env: local
+image:
+  repository: conductor
+  tag: local            # CI sets this to the git SHA via values-<env>.yaml
+  pullPolicy: IfNotPresent
+modelRunner: replay      # replay | bedrock
+bedrockModelId: ""
+awsRegion: us-east-1
+database:
+  existingSecret: conductor-db   # key: url  (created outside git; never commit)
+serviceAccounts:
+  agentRoleArn: ""        # only used with IRSA; Pod Identity needs no annotation
+  dispatcherRoleArn: ""
+dispatcher: {replicas: 1}
+poller: {schedule: "*/5 * * * *"}
+portal: {enabled: true, replicas: 1, port: 8080}
+quota: {cpu: "8", memory: 32Gi, pods: "30"}
