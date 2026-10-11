@@ -33,10 +33,10 @@ Dockerfile, docker-compose.yml, Makefile
 helm/conductor/      chart + values-{local,dev,qa,prod}.yaml
 k8s/local/           throwaway Postgres for minikube
 argocd/              AppProject + Applications (dev auto-sync, qa/prod manual)
-terraform/modules/   ecr rds s3 iam_pod_identity eks
+terraform/modules/   ecr rds s3 eks iam_policies iam_pod_identity iam_irsa
 terraform/envs/      dev qa prod (ECR is created in dev only and shared)
 .github/workflows/   ci (test+build+push), promote (tag-bump PR), terraform (validate+plan)
-scripts/             local-up.sh, promote.sh
+scripts/             local-up.sh, promote.sh, create-db-secret.sh, init-db.sh
 docs/                runbook.md, new-agent-template.md, master-reference.md, Word runbook, access-requests, promotion-flow, images
 ```
 
@@ -58,6 +58,7 @@ Local with a real model (synthetic data only, needs approval): `MODEL_RUNNER=ant
 6. Merge to main → image in ECR → run **promote** for dev. Repeat qa, prod with gates.
 
 ## Docs
+- [docs/aws-setup.md](docs/aws-setup.md): IAM, Pod Identity/IRSA, RDS Postgres, Bedrock access
 - [docs/environment-testing-and-migration.md](docs/environment-testing-and-migration.md): how to test and migrate at each stage
 - [docs/prod-readiness-checklist.md](docs/prod-readiness-checklist.md): what prod-grade needs, by gate
 - [docs/master-reference.md](docs/master-reference.md): runbook for all targets (EKS, AgentCore), limits, costs, open items
