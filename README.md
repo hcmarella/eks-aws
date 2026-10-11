@@ -58,6 +58,7 @@ Local with a real model (synthetic data only, needs approval): `MODEL_RUNNER=ant
 6. Merge to main → image in ECR → run **promote** for dev. Repeat qa, prod with gates.
 
 ## Docs
+- [docs/prod-readiness-checklist.md](docs/prod-readiness-checklist.md): what prod-grade needs, by gate
 - [docs/master-reference.md](docs/master-reference.md): runbook for all targets (EKS, AgentCore), limits, costs, open items
 - [docs/Conductor_Infrastructure_Setup_Runbook.docx](docs/Conductor_Infrastructure_Setup_Runbook.docx): infra setup, requests, diagrams
 
