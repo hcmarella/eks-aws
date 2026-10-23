@@ -1,0 +1,23 @@
+{{- if .Values.portal.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: portal}
+spec:
+  replicas: {{ .Values.portal.replicas }}
+  selector: {matchLabels: {app: portal}}
+  template:
+    metadata: {labels: {app: portal}}
+    spec:
+      containers:
+        - name: portal
+          image: {{ include "fraudagent.image" . }}
+          command: ["python", "portal.py"]   # placeholder, not written yet
+          ports: [{containerPort: {{ .Values.portal.port }}}]
+---
+apiVersion: v1
+kind: Service
+metadata: {name: portal}
+spec:
+  selector: {app: portal}
+  ports: [{port: 80, targetPort: {{ .Values.portal.port }}}]
+{{- end }}
