@@ -35,6 +35,9 @@ def get_runner():
 
 def build(runner=None, checkpointer=None):
     runner = runner or get_runner()
+    import guardrails
+    if guardrails.enabled():
+        runner = guardrails.guarded(runner)  # mask prompt, check answer
 
     def classify(s: State) -> State:
         t = s["text"].lower()

@@ -59,6 +59,7 @@ Local with a real model (synthetic data only, needs approval): `MODEL_RUNNER=ant
 6. Merge to main → image in ECR → run **promote** for dev. Repeat qa, prod with gates.
 
 ## Docs
+- **Evals and PII guardrails: [docs/evals-and-guardrails.md](docs/evals-and-guardrails.md)** · **Practice lab: [docs/practice-lab-agentcore.md](docs/practice-lab-agentcore.md)**
 - **Start here: [docs/execution-order.md](docs/execution-order.md)** — everything below in order of execution
 - [docs/aws-setup.md](docs/aws-setup.md): IAM, Pod Identity/IRSA, RDS Postgres, Bedrock access
 - [docs/environment-testing-and-migration.md](docs/environment-testing-and-migration.md): how to test and migrate at each stage
