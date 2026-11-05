@@ -33,7 +33,7 @@ def get_runner():
     raise ValueError(f"unknown MODEL_RUNNER {kind}")
 
 
-def build(runner=None):
+def build(runner=None, checkpointer=None):
     runner = runner or get_runner()
 
     def classify(s: State) -> State:
@@ -49,4 +49,4 @@ def build(runner=None):
     g.set_entry_point("classify")
     g.add_edge("classify", "answer")
     g.add_edge("answer", END)
-    return g.compile()
+    return g.compile(checkpointer=checkpointer)
