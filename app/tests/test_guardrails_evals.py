@@ -61,3 +61,9 @@ def test_metrics_agent_scores():
 
 def test_golden_cases_pass():
     assert run_golden() == 0
+
+
+def test_card_token_does_not_depend_on_trailing_character():
+    a = guardrails.mask("card 4111 1111 1111 1111 used")[0]
+    b = guardrails.mask("card 4111 1111 1111 1111.")[0]
+    assert a.split()[1] == b.split()[1].rstrip(".") and a == "card " + a.split()[1] + " used"

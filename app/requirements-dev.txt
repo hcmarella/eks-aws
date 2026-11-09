@@ -1,0 +1,2 @@
+moto[secretsmanager]>=5.0
+cryptography>=42

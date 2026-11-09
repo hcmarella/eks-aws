@@ -8,3 +8,4 @@ bedrock-agentcore>=1.0
 langgraph-checkpoint-postgres>=2.0
 langgraph-checkpoint-aws>=1.0
 psycopg-pool>=3.2
+cryptography>=42

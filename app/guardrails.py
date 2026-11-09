@@ -12,7 +12,7 @@ PATTERNS = {
     "SSN": re.compile(r"\b\d{3}-\d{2}-\d{4}\b"),
     "EMAIL": re.compile(r"\b[\w.+-]+@[\w-]+\.[\w.-]+\b"),
     "PHONE": re.compile(r"(?<!\d)(?:\+?1[-. ]?)?\(?\d{3}\)?[-. ]\d{3}[-. ]\d{4}(?!\d)"),
-    "CARD": re.compile(r"\b(?:\d[ -]?){13,19}\b"),
+    "CARD": re.compile(r"\b\d(?:[ -]?\d){12,18}\b"),
 }
 
 
