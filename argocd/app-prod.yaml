@@ -1,0 +1,12 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata: {name: fraudagent-prod, namespace: argocd}
+spec:
+  project: fraudagent
+  source:
+    repoURL: https://github.com/hcmarella/eks-aws.git
+    targetRevision: main
+    path: helm/fraudagent
+    helm: {valueFiles: [values.yaml, values-prod.yaml]}
+  destination: {server: https://kubernetes.default.svc, namespace: fraudagent-prod}
+  syncPolicy: {syncOptions: [CreateNamespace=true]}   # manual sync = approval gate

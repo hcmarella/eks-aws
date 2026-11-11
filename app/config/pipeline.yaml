@@ -1,0 +1,4 @@
+# Order of stages is config, not code. PENDING CONFIRMATION by Hem: order of census / freeze / red_team / vote.
+stages: [plan_segments, segment_checks, census, freeze, vote, red_team, outcome, seal, excel, publish]
+limits: {replan_max: 2, hold_rerun_max: 1, votes_min: 3, votes_max: 4, step_timeout_s: 900}
+outcomes: [PUBLISH, PUBLISH_WITH_CAVEAT, HOLD]

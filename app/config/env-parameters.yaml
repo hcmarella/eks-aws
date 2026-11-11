@@ -1,0 +1,45 @@
+# One row per environment. The image is the same everywhere; only these values change.
+# Values marked <...> come from your platform team or your AWS account. Never put secrets here (use Secrets Manager).
+common:
+  aws_region: us-east-1                 # pick one region and keep it the same in every environment
+  image_repo: fraudagent-agent          # ECR repo name; ask the platform team for the real path
+  image_tag: "<git-sha>"                # same digest is promoted dev -> test -> qa -> prod
+  model_runner: bedrock                 # replay for local tests only
+  log_level: INFO
+
+environments:
+  local:
+    app_env: local
+    model_runner: replay
+    memory_backend: postgres            # Docker Postgres; use "memory" for the quickest run
+    database_url: postgresql://fa:fa@localhost:5432/fa
+    db_setup: "1"
+  dev:
+    app_env: dev
+    memory_backend: memory              # step A: in-memory; step B: postgres on a small dev DB
+    database_secret: "<secrets-manager-arn-dev>"
+    bedrock_model_id: "<dev-model-id>"
+    runtime_name: fraudagent_dev
+    network_mode: PUBLIC                # VPC only when the agent must reach private Postgres/Lakebase
+  test:
+    app_env: test
+    memory_backend: postgres
+    database_secret: "<secrets-manager-arn-test>"
+    bedrock_model_id: "<test-model-id>"
+    runtime_name: fraudagent_test
+    network_mode: "<PUBLIC-or-VPC>"
+  qa:
+    app_env: qa
+    memory_backend: postgres            # Lakebase when connectivity is approved
+    database_secret: "<secrets-manager-arn-qa>"
+    bedrock_model_id: "<qa-model-id>"
+    runtime_name: fraudagent_qa
+    network_mode: "<VPC>"
+  prod:
+    app_env: prod
+    memory_backend: postgres            # Lakebase; scale-to-zero OFF
+    database_secret: "<secrets-manager-arn-prod>"
+    bedrock_model_id: "<prod-model-id>"
+    runtime_name: fraudagent_prod
+    network_mode: "<VPC>"
+    notes: "Bedrock only. Manual approval before deploy. Same image digest as QA."

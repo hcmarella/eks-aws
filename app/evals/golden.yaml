@@ -1,0 +1,4 @@
+# Golden cases: synthetic only. Add a case for every real failure you find, then it can never silently come back.
+- {case_id: g1, text: "unauthorized card charge on account", expected: fraud}
+- {case_id: g2, text: "customer asked about statement date", expected: other}
+- {case_id: g3, text: "stolen card used abroad", expected: fraud}

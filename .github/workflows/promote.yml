@@ -1,0 +1,19 @@
+name: promote
+on:
+  workflow_dispatch:
+    inputs:
+      env: {description: "dev, qa or prod", required: true}
+      sha: {description: "git SHA already pushed to ECR", required: true}
+permissions: {contents: write, pull-requests: write}
+jobs:
+  pr:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: scripts/promote.sh "${{ inputs.env }}" "${{ inputs.sha }}"
+      - run: |
+          git checkout -b promote-${{ inputs.env }}-${{ inputs.sha }}
+          git commit -am "promote ${{ inputs.sha }} to ${{ inputs.env }}"
+          git push origin HEAD
+          gh pr create --title "Promote ${{ inputs.sha }} to ${{ inputs.env }}" --body "Tag bump only. Merge = approval." --base main
+        env: {GH_TOKEN: "${{ github.token }}"}

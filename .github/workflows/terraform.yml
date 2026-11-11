@@ -1,0 +1,18 @@
+name: terraform
+on:
+  pull_request: {paths: ["terraform/**"]}
+  push: {branches: [main], paths: ["terraform/**"]}
+permissions: {id-token: write, contents: read}
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    strategy: {matrix: {env: [dev, qa, prod]}}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+      - uses: aws-actions/configure-aws-credentials@v4
+        with: {role-to-assume: "${{ vars.AWS_TF_PLAN_ROLE_ARN }}", aws-region: us-east-1}
+      - run: terraform -chdir=terraform/envs/${{ matrix.env }} init
+      - run: terraform -chdir=terraform/envs/${{ matrix.env }} validate
+      - run: terraform -chdir=terraform/envs/${{ matrix.env }} plan -var-file=${{ matrix.env }}.tfvars -no-color
+  # apply is intentionally manual (run from a workstation or an approved environment job) until approvals exist.
